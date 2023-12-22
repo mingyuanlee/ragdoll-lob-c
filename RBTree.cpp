@@ -136,22 +136,28 @@ LimitNode* RBTree::insertBST(LimitNode *&root, LimitNode *&ptr) {
   return root;
 }
 
-// a new limit price arrives, insert it into the tree
-LimitNode *RBTree::insertLimitPrice(int limit_price) {
+// a new limit price arrives, insert it into the tree and map
+void RBTree::insertLimitPrice(int limit_price) {
   LimitNode *node = new LimitNode(limit_price);
+  limit_map[limit_price] = node;
   root = insertBST(root, node);
   fixInsertRBTree(node);
-  return node;
 }
 
-// delete a limit price from the tree, will free all the orders, then free the node
-// Idea: put the map in the RB Tree
-void RBTree::deleteLimitPrice(int limit_price) {
-  LimitNode *node = limit_map[limit_price];
-  // Delete the limit map entry
-  limit_map.erase(limit_price);
-  // Delete all the orders
-  OrderNode *current = node->head;
+LimitNode* RBTree::deleteBST(LimitNode *&root, int limit_price) {
+  if (root == nullptr)
+    return root;
+  if (limit_price < root->limit_price)
+    return deleteBST(root->left, limit_price);
+  if (limit_price > root->limit_price)
+    return deleteBST(root->right, limit_price);
+  // Node with Single Child or No Child
+  if (root->left == nullptr || root->right == nullptr)
+    return root;
+  // Node with two children: Get the inorder successor (smallest in the right subtree)
+  LimitNode *temp = minValueNode(root->right);
+  // Here we need to copy the data to the deleting node, but need to delete all the orders
+  OrderNode *current = root->head;
   while (current != nullptr) {
     OrderNode *next = current->next;
     // Delete the order map entry
@@ -160,10 +166,27 @@ void RBTree::deleteLimitPrice(int limit_price) {
     delete current;
     current = next;
   }
-  // fix the tree
+  // Then copy the data
+  root->limit_price = temp->limit_price;
+  root->total_volume = temp->total_volume;
+  root->size = temp->size;
+  root->head = temp->head;
+  root->tail = temp->tail;
+  temp->head = nullptr;
+  temp->tail = nullptr;
+  // Also need to point the map entry to this node
+  limit_map[temp->limit_price] = root;
+  return deleteBST(root->right, temp->limit_price);
+}
+
+// delete a limit price from the tree, will free all the orders, then free the node
+// Idea: put the map in the RB Tree
+void RBTree::deleteLimitPrice(int limit_price) {
+  // Delete the limit map entry
+  limit_map.erase(limit_price);
+  LimitNode *node = deleteBST(root, limit_price);
+  // fix the tree, also delete the node
   fixDeleteRBTree(node);
-  // Delete the limit node
-  delete node;
 }
 
 void RBTree::rotateLeft(LimitNode *&ptr) {
@@ -340,6 +363,24 @@ void RBTree::fixDeleteRBTree(LimitNode *&node) {
     delete(node);
     setColor(root, BLACK);
   }
+}
+
+LimitNode *RBTree::minValueNode(LimitNode *&node) {
+  LimitNode *ptr = node;
+
+  while (ptr->left != nullptr)
+    ptr = ptr->left;
+
+  return ptr;
+}
+
+LimitNode* RBTree::maxValueNode(LimitNode *&node) {
+  LimitNode *ptr = node;
+
+  while (ptr->right != nullptr)
+    ptr = ptr->right;
+
+  return ptr;
 }
 
 void RBTree::inorderBST(LimitNode *&ptr) {

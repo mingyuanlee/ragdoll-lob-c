@@ -53,10 +53,10 @@ protected:
   void inorderBST(LimitNode *&);
   int getColor(LimitNode *&);
   void setColor(LimitNode *&, int);
-  // LimitNode *minValueNode(LimitNode *&);
-  // LimitNode *maxValueNode(LimitNode *&);
+  LimitNode *minValueNode(LimitNode *&);
+  LimitNode *maxValueNode(LimitNode *&);
   LimitNode* insertBST(LimitNode *&, LimitNode *&);
-  // LimitNode* deleteBST(LimitNode *&, int);
+  LimitNode* deleteBST(LimitNode *&, int);
 public:
   int instrument; // instrument id
   TreeType type; // bid or ask
@@ -64,7 +64,7 @@ public:
   std::unordered_map<int, OrderNode*> order_map; // order id -> Order
 
   RBTree(int, TreeType);
-  LimitNode *insertLimitPrice(int limit_price);
+  void insertLimitPrice(int limit_price);
   void deleteLimitPrice(int limit_price);
   // void merge(RBTree);
   void inorder();

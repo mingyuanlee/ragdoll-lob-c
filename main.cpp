@@ -13,4 +13,12 @@ int main() {
   // bid_tree->inorder();
   bid_tree->insertLimitPrice(150);
   bid_tree->inorder();
+
+  cout << "---------------------" << endl;
+  // bid_tree->inorder();
+  bid_tree->deleteLimitPrice(200);
+  bid_tree->inorder();
+  bid_tree->deleteLimitPrice(100);
+  bid_tree->deleteLimitPrice(300);
+  bid_tree->inorder();
 }
