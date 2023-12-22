@@ -4,8 +4,11 @@
 #include "RBTree.h"
 #include <unordered_map>
 
+enum OrderType { Bid, Ask };
+
 class LOB {
 private:
+  int next_oid;
 public:
   // after test, move to private
   RBTree bid_tree;
@@ -17,7 +20,8 @@ public:
 
   LOB(int instrument);
 
-  // insert_order
+  int make_order(OrderType type, int limit_price, int volume, int owner);
+  void cancel_order(OrderType type, int oid);
   // cancel_order
 };
 

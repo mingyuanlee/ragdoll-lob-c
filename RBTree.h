@@ -2,6 +2,7 @@
 #define RED_BLACK_TREE_RBTREE_H
 
 #include <unordered_map>
+#include <string>
 
 enum Color {RED, BLACK, DOUBLE_BLACK};
 enum TreeType {BID, ASK};
@@ -35,10 +36,11 @@ public:
   bool color;
   LimitNode(int limit_price);
 
-  void insert_order(int oid, int volume, int owner);
+  OrderNode *insert_order(int oid, int volume, int owner);
   void delete_order(OrderNode *);
   OrderNode *pop_front_order();
-  OrderNode *peek_front_order();
+  // OrderNode *peek_front_order();
+  void front_order_deduct_volume(int volume);
 };
 
 class RBTree
@@ -57,6 +59,7 @@ protected:
   LimitNode *maxValueNode(LimitNode *&);
   LimitNode* insertBST(LimitNode *&, LimitNode *&);
   LimitNode* deleteBST(LimitNode *&, int);
+  void prettyPrint(LimitNode* root, std::string prefix = "", bool isLeft = false);
 public:
   int instrument; // instrument id
   TreeType type; // bid or ask
@@ -64,10 +67,14 @@ public:
   std::unordered_map<int, OrderNode*> order_map; // order id -> Order
 
   RBTree(int, TreeType);
-  void insertLimitPrice(int limit_price);
+  LimitNode *insertLimitPrice(int limit_price);
   void deleteLimitPrice(int limit_price);
+  void deleteOrder(int oid);
+  void insertOrder(int oid, int volume, int owner, int limit_price);
+  LimitNode *minLimitNode();
   // void merge(RBTree);
   void inorder();
+  void print();
 };
 
 #endif //RED_BLACK_TREE_RBTREE_H

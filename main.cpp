@@ -1,6 +1,9 @@
 #include "LOB.h"
 #include <iostream>
+#include <string>
 using namespace std;
+
+
 
 int main() {
   LOB book = LOB(1);
@@ -12,13 +15,16 @@ int main() {
   bid_tree->insertLimitPrice(300);
   // bid_tree->inorder();
   bid_tree->insertLimitPrice(150);
-  bid_tree->inorder();
+  bid_tree->print();
 
   cout << "---------------------" << endl;
   // bid_tree->inorder();
   bid_tree->deleteLimitPrice(200);
-  bid_tree->inorder();
+  bid_tree->print();
   bid_tree->deleteLimitPrice(100);
+  cout << endl;
+  bid_tree->print();
   bid_tree->deleteLimitPrice(300);
-  bid_tree->inorder();
+  cout << endl;
+  bid_tree->print();
 }

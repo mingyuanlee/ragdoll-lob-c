@@ -34,14 +34,14 @@ LimitNode::LimitNode(int limit_price) {
   this->color = RED;
 }
 
-void LimitNode::insert_order(int oid, int volume, int owner) {
+OrderNode *LimitNode::insert_order(int oid, int volume, int owner) {
   // 1. make the order node
   OrderNode *order = new OrderNode(oid, limit_price, volume, owner, nullptr, nullptr, this);
   // 2. insert into the linked list
   if (head == nullptr) {
     head = order;
     tail = order;
-    return;
+    return order;
   }
   tail->next = order;
   order->prev = tail;
@@ -49,6 +49,7 @@ void LimitNode::insert_order(int oid, int volume, int owner) {
   // 3. update metadata
   total_volume += order->volume;
   size += limit_price * order->volume;
+  return order;
 }
 
 // TODO: Note that bid_order_map still references to this node. It is caller(LOB)'s responsibility to delete the map entry first
@@ -94,10 +95,16 @@ OrderNode *LimitNode::pop_front_order() {
   return order;
 }
 
-// Peek, then can check the data
-OrderNode *LimitNode::peek_front_order() {
-  return head;
+void LimitNode::front_order_deduct_volume(int volume) {
+  head->volume -= volume;
+  total_volume -= volume;
+  size -= limit_price * volume;
 }
+
+// // Peek, then can check the data
+// OrderNode *LimitNode::peek_front_order() {
+//   return head;
+// }
 
 
 // ===================================================
@@ -136,12 +143,13 @@ LimitNode* RBTree::insertBST(LimitNode *&root, LimitNode *&ptr) {
   return root;
 }
 
-// a new limit price arrives, insert it into the tree and map
-void RBTree::insertLimitPrice(int limit_price) {
+// a new limit price arrives, insert it into the tree and map, resulting in an empty limit node
+LimitNode *RBTree::insertLimitPrice(int limit_price) {
   LimitNode *node = new LimitNode(limit_price);
   limit_map[limit_price] = node;
   root = insertBST(root, node);
   fixInsertRBTree(node);
+  return node;
 }
 
 LimitNode* RBTree::deleteBST(LimitNode *&root, int limit_price) {
@@ -177,6 +185,29 @@ LimitNode* RBTree::deleteBST(LimitNode *&root, int limit_price) {
   // Also need to point the map entry to this node
   limit_map[temp->limit_price] = root;
   return deleteBST(root->right, temp->limit_price);
+}
+
+/**
+ * Find the leftmost node value
+*/
+LimitNode *RBTree::minLimitNode() {
+  if (root == nullptr) return nullptr;
+  LimitNode *curr = root;
+  while (curr->left != nullptr) { curr = curr->left; }
+  return curr;
+}
+
+void RBTree::deleteOrder(int oid) {
+  OrderNode *order = order_map[oid];
+  LimitNode *node = order->limit_node;
+  node->delete_order(order);
+  order_map.erase(oid);
+}
+
+void RBTree::insertOrder(int oid, int volume, int owner, int limit_price) {
+  LimitNode *node = limit_map[limit_price];
+  OrderNode *order = node->insert_order(oid, volume, owner);
+  order_map[oid] = order;
 }
 
 // delete a limit price from the tree, will free all the orders, then free the node
@@ -384,14 +415,34 @@ LimitNode* RBTree::maxValueNode(LimitNode *&node) {
 }
 
 void RBTree::inorderBST(LimitNode *&ptr) {
-    if (ptr == nullptr)
-        return;
+  if (ptr == nullptr)
+    return;
 
-    inorderBST(ptr->left);
-    cout << ptr->limit_price << " " << ptr->color << endl;
-    inorderBST(ptr->right);
+  inorderBST(ptr->left);
+  cout << ptr->limit_price << " " << ptr->color << endl;
+  inorderBST(ptr->right);
 }
 
 void RBTree::inorder() {
-    inorderBST(root);
+  inorderBST(root);
+}
+
+void RBTree::print() {
+  prettyPrint(root);
+}
+
+void RBTree::prettyPrint(LimitNode* root, string prefix, bool isLeft) {
+  if( root != nullptr )
+  {
+    std::cout << prefix;
+
+    std::cout << (isLeft ? "├──" : "└──" );
+
+    // print the value of the node
+    std::cout << root->limit_price << std::endl;
+
+    // enter the next tree level - left and right branch
+    prettyPrint( root->left, prefix + (isLeft ? "│   " : "    "), true);
+    prettyPrint( root->right, prefix + (isLeft ? "│   " : "    "), false);
+  }
 }
