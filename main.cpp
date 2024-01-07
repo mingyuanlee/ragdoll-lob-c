@@ -28,3 +28,6 @@ int main() {
   cout << endl;
   bid_tree->print();
 }
+
+// first problem: after delete 300, nothing is shown
+// second problem: after deleting 200, the tree didn't rebalance

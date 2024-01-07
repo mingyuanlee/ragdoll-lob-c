@@ -72,6 +72,7 @@ public:
   void deleteOrder(int oid);
   void insertOrder(int oid, int volume, int owner, int limit_price);
   LimitNode *minLimitNode();
+  void rbTransplant(LimitNode *u, LimitNode *v);
   // void merge(RBTree);
   void inorder();
   void print();

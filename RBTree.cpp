@@ -152,40 +152,40 @@ LimitNode *RBTree::insertLimitPrice(int limit_price) {
   return node;
 }
 
-LimitNode* RBTree::deleteBST(LimitNode *&root, int limit_price) {
-  if (root == nullptr)
-    return root;
-  if (limit_price < root->limit_price)
-    return deleteBST(root->left, limit_price);
-  if (limit_price > root->limit_price)
-    return deleteBST(root->right, limit_price);
-  // Node with Single Child or No Child
-  if (root->left == nullptr || root->right == nullptr)
-    return root;
-  // Node with two children: Get the inorder successor (smallest in the right subtree)
-  LimitNode *temp = minValueNode(root->right);
-  // Here we need to copy the data to the deleting node, but need to delete all the orders
-  OrderNode *current = root->head;
-  while (current != nullptr) {
-    OrderNode *next = current->next;
-    // Delete the order map entry
-    order_map.erase(current->oid);
-    // Delete the order
-    delete current;
-    current = next;
-  }
-  // Then copy the data
-  root->limit_price = temp->limit_price;
-  root->total_volume = temp->total_volume;
-  root->size = temp->size;
-  root->head = temp->head;
-  root->tail = temp->tail;
-  temp->head = nullptr;
-  temp->tail = nullptr;
-  // Also need to point the map entry to this node
-  limit_map[temp->limit_price] = root;
-  return deleteBST(root->right, temp->limit_price);
-}
+// LimitNode* RBTree::deleteBST(LimitNode *&root, int limit_price) {
+//   if (root == nullptr)
+//     return root;
+//   if (limit_price < root->limit_price)
+//     return deleteBST(root->left, limit_price);
+//   if (limit_price > root->limit_price)
+//     return deleteBST(root->right, limit_price);
+//   // Node with Single Child or No Child
+//   if (root->left == nullptr || root->right == nullptr)
+//     return root;
+//   // Node with two children: Get the inorder successor (smallest in the right subtree)
+//   LimitNode *temp = minValueNode(root->right);
+//   // Here we need to copy the data to the deleting node, but need to delete all the orders
+//   OrderNode *current = root->head;
+//   while (current != nullptr) {
+//     OrderNode *next = current->next;
+//     // Delete the order map entry
+//     order_map.erase(current->oid);
+//     // Delete the order
+//     delete current;
+//     current = next;
+//   }
+//   // Then copy the data
+//   root->limit_price = temp->limit_price;
+//   root->total_volume = temp->total_volume;
+//   root->size = temp->size;
+//   root->head = temp->head;
+//   root->tail = temp->tail;
+//   temp->head = nullptr;
+//   temp->tail = nullptr;
+//   // Also need to point the map entry to this node
+//   limit_map[temp->limit_price] = root;
+//   return deleteBST(root->right, temp->limit_price);
+// }
 
 /**
  * Find the leftmost node value
@@ -211,13 +211,78 @@ void RBTree::insertOrder(int oid, int volume, int owner, int limit_price) {
 }
 
 // delete a limit price from the tree, will free all the orders, then free the node
-// Idea: put the map in the RB Tree
+// void RBTree::deleteLimitPrice(int limit_price) {
+//   // Delete the limit map entry
+//   limit_map.erase(limit_price);
+//   LimitNode *node = deleteBST(root, limit_price);
+//   // fix the tree, also delete the node
+//   fixDeleteRBTree(node);
+// }
+
+void RBTree::rbTransplant(LimitNode *u, LimitNode *v) {
+  if (u->parent == nullptr) {
+    root = v;
+  } else if (u == u->parent->left) {
+    u->parent->left = v;
+  } else {
+    u->parent->right = v;
+  }
+  v->parent = u->parent;
+}
+
 void RBTree::deleteLimitPrice(int limit_price) {
   // Delete the limit map entry
   limit_map.erase(limit_price);
-  LimitNode *node = deleteBST(root, limit_price);
-  // fix the tree, also delete the node
-  fixDeleteRBTree(node);
+
+  LimitNode *z = nullptr;
+  LimitNode *x, *y;
+  LimitNode *node = root;
+  while (node != nullptr) {
+    if (node->limit_price == limit_price) {
+      z = node;
+    }
+
+    if (node->limit_price <= limit_price) {
+      node = node->right;
+    } else {
+      node = node->left;
+    }
+  }
+
+  if (z == nullptr) {
+    cout << "Key not found in the tree" << endl;
+    return;
+  }
+
+  y = z;
+  int y_original_color = y->color;
+  if (z->left == nullptr) {
+    x = z->right;
+    rbTransplant(z, z->right);
+  } else if (z->right == nullptr) {
+    x = z->left;
+    rbTransplant(z, z->left);
+  } else {
+    y = minValueNode(z->right);
+    y_original_color = y->color;
+    x = y->right;
+    if (y->parent == z) {
+      x->parent = y;
+    } else {
+      rbTransplant(y, y->right);
+      y->right = z->right;
+      y->right->parent = y;
+    }
+
+    rbTransplant(z, y);
+    y->left = z->left;
+    y->left->parent = y;
+    y->color = z->color;
+  }
+  delete z;
+  if (y_original_color == 0) {
+    fixDeleteRBTree(x);
+  }
 }
 
 void RBTree::rotateLeft(LimitNode *&ptr) {
@@ -253,148 +318,209 @@ void RBTree::rotateRight(LimitNode *&ptr) {
 }
 
 void RBTree::fixInsertRBTree(LimitNode *&ptr) {
-    LimitNode *parent = nullptr;
-    LimitNode *grandparent = nullptr;
-    while (ptr != root && getColor(ptr) == RED && getColor(ptr->parent) == RED) {
-      parent = ptr->parent;
-      grandparent = parent->parent;
-      if (parent == grandparent->left) {
-        LimitNode *uncle = grandparent->right;
-        if (getColor(uncle) == RED) {
-          setColor(uncle, BLACK);
-          setColor(parent, BLACK);
-          setColor(grandparent, RED);
-          ptr = grandparent;
-        } else {
-          if (ptr == parent->right) {
-            rotateLeft(parent);
-            ptr = parent;
-            parent = ptr->parent;
-          }
-          rotateRight(grandparent);
-          swap(parent->color, grandparent->color);
-          ptr = parent;
-        }
+  LimitNode *parent = nullptr;
+  LimitNode *grandparent = nullptr;
+  while (ptr != root && getColor(ptr) == RED && getColor(ptr->parent) == RED) {
+    parent = ptr->parent;
+    grandparent = parent->parent;
+    if (parent == grandparent->left) {
+      LimitNode *uncle = grandparent->right;
+      if (getColor(uncle) == RED) {
+        setColor(uncle, BLACK);
+        setColor(parent, BLACK);
+        setColor(grandparent, RED);
+        ptr = grandparent;
       } else {
-        LimitNode *uncle = grandparent->left;
-        if (getColor(uncle) == RED) {
-          setColor(uncle, BLACK);
-          setColor(parent, BLACK);
-          setColor(grandparent, RED);
-          ptr = grandparent;
-        } else {
-          if (ptr == parent->left) {
-            rotateRight(parent);
-            ptr = parent;
-            parent = ptr->parent;
-          }
-          rotateLeft(grandparent);
-          swap(parent->color, grandparent->color);
-          ptr = parent;
-        }
-      }
-    }
-    setColor(root, BLACK);
-}
-
-void RBTree::fixDeleteRBTree(LimitNode *&node) {
-  if (node == nullptr)
-    return;
-
-  if (node == root) {
-    root = nullptr;
-    return;
-  }
-
-  if (getColor(node) == RED || getColor(node->left) == RED || getColor(node->right) == RED) {
-    LimitNode *child = node->left != nullptr ? node->left : node->right;
-
-    if (node == node->parent->left) {
-      node->parent->left = child;
-      if (child != nullptr)
-        child->parent = node->parent;
-      setColor(child, BLACK);
-      delete (node);
-    } else {
-      node->parent->right = child;
-      if (child != nullptr)
-        child->parent = node->parent;
-      setColor(child, BLACK);
-      delete (node);
-    }
-  } else {
-    LimitNode *sibling = nullptr;
-    LimitNode *parent = nullptr;
-    LimitNode *ptr = node;
-    setColor(ptr, DOUBLE_BLACK);
-    while (ptr != root && getColor(ptr) == DOUBLE_BLACK) {
-      parent = ptr->parent;
-      if (ptr == parent->left) {
-        sibling = parent->right;
-        if (getColor(sibling) == RED) {
-          setColor(sibling, BLACK);
-          setColor(parent, RED);
+        if (ptr == parent->right) {
           rotateLeft(parent);
-        } else {
-          if (getColor(sibling->left) == BLACK && getColor(sibling->right) == BLACK) {
-            setColor(sibling, RED);
-            if(getColor(parent) == RED)
-              setColor(parent, BLACK);
-            else
-              setColor(parent, DOUBLE_BLACK);
-            ptr = parent;
-          } else {
-            if (getColor(sibling->right) == BLACK) {
-              setColor(sibling->left, BLACK);
-              setColor(sibling, RED);
-              rotateRight(sibling);
-              sibling = parent->right;
-            }
-            setColor(sibling, parent->color);
-            setColor(parent, BLACK);
-            setColor(sibling->right, BLACK);
-            rotateLeft(parent);
-            break;
-          }
+          ptr = parent;
+          parent = ptr->parent;
         }
+        rotateRight(grandparent);
+        swap(parent->color, grandparent->color);
+        ptr = parent;
+      }
+    } else {
+      LimitNode *uncle = grandparent->left;
+      if (getColor(uncle) == RED) {
+        setColor(uncle, BLACK);
+        setColor(parent, BLACK);
+        setColor(grandparent, RED);
+        ptr = grandparent;
       } else {
-        sibling = parent->left;
-        if (getColor(sibling) == RED) {
-          setColor(sibling, BLACK);
-          setColor(parent, RED);
+        if (ptr == parent->left) {
           rotateRight(parent);
-        } else {
-          if (getColor(sibling->left) == BLACK && getColor(sibling->right) == BLACK) {
-            setColor(sibling, RED);
-            if (getColor(parent) == RED)
-              setColor(parent, BLACK);
-            else
-              setColor(parent, DOUBLE_BLACK);
-            ptr = parent;
-          } else {
-            if (getColor(sibling->left) == BLACK) {
-              setColor(sibling->right, BLACK);
-              setColor(sibling, RED);
-              rotateLeft(sibling);
-              sibling = parent->left;
-            }
-            setColor(sibling, parent->color);
-            setColor(parent, BLACK);
-            setColor(sibling->left, BLACK);
-            rotateRight(parent);
-            break;
-          }
+          ptr = parent;
+          parent = ptr->parent;
         }
+        rotateLeft(grandparent);
+        swap(parent->color, grandparent->color);
+        ptr = parent;
       }
     }
-    if (node == node->parent->left)
-      node->parent->left = nullptr;
-    else
-      node->parent->right = nullptr;
-    delete(node);
-    setColor(root, BLACK);
   }
+  setColor(root, BLACK);
 }
+
+void RBTree::fixDeleteRBTree(LimitNode *&x) {
+  LimitNode *s;
+  while (x != root && x->color == 0) {
+    if (x == x->parent->left) {
+      s = x->parent->right;
+      if (s->color == 1) {
+        s->color = 0;
+        x->parent->color = 1;
+        rotateLeft(x->parent);
+        s = x->parent->right;
+      }
+
+      if (s->left->color == 0 && s->right->color == 0) {
+        s->color = 1;
+        x = x->parent;
+      } else {
+        if (s->right->color == 0) {
+          s->left->color = 0;
+          s->color = 1;
+          rotateRight(s);
+          s = x->parent->right;
+        }
+
+        s->color = x->parent->color;
+        x->parent->color = 0;
+        s->right->color = 0;
+        rotateLeft(x->parent);
+        x = root;
+      }
+    } else {
+      s = x->parent->left;
+      if (s->color == 1) {
+        s->color = 0;
+        x->parent->color = 1;
+        rotateRight(x->parent);
+        s = x->parent->left;
+      }
+
+      if (s->right->color == 0 && s->right->color == 0) {
+        s->color = 1;
+        x = x->parent;
+      } else {
+        if (s->left->color == 0) {
+          s->right->color = 0;
+          s->color = 1;
+          rotateLeft(s);
+          s = x->parent->left;
+        }
+
+        s->color = x->parent->color;
+        x->parent->color = 0;
+        s->left->color = 0;
+        rotateRight(x->parent);
+        x = root;
+      }
+    }
+  }
+  x->color = 0;
+}
+
+// void RBTree::fixDeleteRBTree(LimitNode *&node) {
+//   if (node == nullptr)
+//     return;
+
+//   // here is the problem, we set root = null?
+//   if (node == root) {
+//     root = nullptr;
+//     return;
+//   }
+
+//   if (getColor(node) == RED || getColor(node->left) == RED || getColor(node->right) == RED) {
+//     LimitNode *child = node->left != nullptr ? node->left : node->right;
+
+//     if (node == node->parent->left) {
+//       node->parent->left = child;
+//       if (child != nullptr)
+//         child->parent = node->parent;
+//       setColor(child, BLACK);
+//       delete (node);
+//     } else {
+//       node->parent->right = child;
+//       if (child != nullptr)
+//         child->parent = node->parent;
+//       setColor(child, BLACK);
+//       delete (node);
+//     }
+//   } else {
+//     LimitNode *sibling = nullptr;
+//     LimitNode *parent = nullptr;
+//     LimitNode *ptr = node;
+//     setColor(ptr, DOUBLE_BLACK);
+//     while (ptr != root && getColor(ptr) == DOUBLE_BLACK) {
+//       parent = ptr->parent;
+//       if (ptr == parent->left) {
+//         sibling = parent->right;
+//         if (getColor(sibling) == RED) {
+//           setColor(sibling, BLACK);
+//           setColor(parent, RED);
+//           rotateLeft(parent);
+//         } else {
+//           if (getColor(sibling->left) == BLACK && getColor(sibling->right) == BLACK) {
+//             setColor(sibling, RED);
+//             if(getColor(parent) == RED)
+//               setColor(parent, BLACK);
+//             else
+//               setColor(parent, DOUBLE_BLACK);
+//             ptr = parent;
+//           } else {
+//             if (getColor(sibling->right) == BLACK) {
+//               setColor(sibling->left, BLACK);
+//               setColor(sibling, RED);
+//               rotateRight(sibling);
+//               sibling = parent->right;
+//             }
+//             setColor(sibling, parent->color);
+//             setColor(parent, BLACK);
+//             setColor(sibling->right, BLACK);
+//             rotateLeft(parent);
+//             break;
+//           }
+//         }
+//       } else {
+//         sibling = parent->left;
+//         if (getColor(sibling) == RED) {
+//           setColor(sibling, BLACK);
+//           setColor(parent, RED);
+//           rotateRight(parent);
+//         } else {
+//           if (getColor(sibling->left) == BLACK && getColor(sibling->right) == BLACK) {
+//             setColor(sibling, RED);
+//             if (getColor(parent) == RED)
+//               setColor(parent, BLACK);
+//             else
+//               setColor(parent, DOUBLE_BLACK);
+//             ptr = parent;
+//           } else {
+//             if (getColor(sibling->left) == BLACK) {
+//               setColor(sibling->right, BLACK);
+//               setColor(sibling, RED);
+//               rotateLeft(sibling);
+//               sibling = parent->left;
+//             }
+//             setColor(sibling, parent->color);
+//             setColor(parent, BLACK);
+//             setColor(sibling->left, BLACK);
+//             rotateRight(parent);
+//             break;
+//           }
+//         }
+//       }
+//     }
+//     if (node == node->parent->left)
+//       node->parent->left = nullptr;
+//     else
+//       node->parent->right = nullptr;
+//     delete(node);
+//     setColor(root, BLACK);
+//   }
+// }
 
 LimitNode *RBTree::minValueNode(LimitNode *&node) {
   LimitNode *ptr = node;
