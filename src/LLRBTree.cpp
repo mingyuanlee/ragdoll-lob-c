@@ -211,7 +211,12 @@ void LLRBTree::prettyPrint(LimitNode* root, string prefix, bool isLeft) {
 
 void LLRBTree::print_limit_map() {
   for (auto it = limit_map.begin(); it != limit_map.end(); it++) {
-    cout << it->first << " " << it->second->limit_price << endl;
+    int key = it->first;
+    LimitNode *node = it->second;
+    cout << "<LimitNode: key " << key;
+    cout << " price " << node->limit_price;
+    cout << " vol " << node->total_volume << " size " << node->size;
+    cout << " head " << node->head << " tail " << node->tail << ">" << endl;
   }
 }
 
@@ -222,7 +227,7 @@ void LLRBTree::print_orders_via_tree() {
 void LLRBTree::print_orders_via_tree_helper(LimitNode *h) {
   if (h == nullptr) return;
   print_orders_via_tree_helper(h->left);
-  cout << "limit price: " << h->limit_price << ": ";
+  cout << "Limit price: " << h->limit_price << " ";
   Utils::print_linked_list(h->head, h->tail);
   print_orders_via_tree_helper(h->right);
 }

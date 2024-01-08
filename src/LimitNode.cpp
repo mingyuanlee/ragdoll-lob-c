@@ -36,7 +36,6 @@ OrderNode *LimitNode::insert_order(int oid, int volume, int owner) {
   // 1. make the order node
   OrderNode *order = new OrderNode(oid, limit_price, volume, owner, nullptr, nullptr, this);
   // 2. insert into the linked list
-  std::cout << "inserting order: " << oid << " " << head << " " << tail << std::endl;
   if (head == nullptr) {
     head = order;
     tail = order;

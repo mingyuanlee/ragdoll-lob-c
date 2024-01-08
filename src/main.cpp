@@ -40,7 +40,6 @@ int main() {
   bid_tree->insert_order(4, 10, 10, 4);
   bid_tree->insert_order(5, 40, 20, 5);
   bid_tree->insert_order(6, 40, 20, 5);
-  // bid_tree->insert_order(7, 20, 20, 5);
   bid_tree->print_orders_via_tree();
   bid_tree->print_orders_via_map();
 }
