@@ -3,8 +3,10 @@
 
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 #include "LimitNode.h"
+#include "DTO.h"
 
 enum OrderType {BID, ASK};
 
@@ -12,6 +14,10 @@ class LLRBTree
 {
 private:
   LimitNode *root;
+  int instrument; // instrument id
+  OrderType type; // bid or ask
+  std::unordered_map<int, LimitNode*> limit_map; // limit price -> LimitNode
+  std::unordered_map<int, OrderNode*> order_map; // order id -> Order
 
   /* Tree Node Operations */
   LimitNode *insert(LimitNode *h, int limit_price);
@@ -35,11 +41,6 @@ private:
   void prettyPrint(LimitNode* root, std::string prefix = "", bool isLeft = false);
   void print_orders_via_tree_helper(LimitNode *h);
 public:
-  int instrument; // instrument id
-  OrderType type; // bid or ask
-  std::unordered_map<int, LimitNode*> limit_map; // limit price -> LimitNode
-  std::unordered_map<int, OrderNode*> order_map; // order id -> Order
-  
   LLRBTree(int instrument, OrderType type);
   
   // tree modification
@@ -53,6 +54,7 @@ public:
   // query functions
   LimitNode *min_limit_node();
   LimitNode *get_limit_node(int limit_price) const;
+  std::vector<OrderInfo> get_all_orders();
 
   // debug functions
   void print();

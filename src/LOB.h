@@ -1,8 +1,9 @@
 #ifndef LOB_H
 #define LOB_H
 
-#include "LLRBTree.h"
 #include <unordered_map>
+#include <vector>
+#include "LLRBTree.h"
 
 class LOB {
 private:
@@ -18,8 +19,13 @@ public:
 
   LOB(int instrument);
 
+  /* modification */
   int make_order(OrderType type, int limit_price, int volume, int owner);
   void cancel_order(OrderType type, int oid);
+
+  /* query */
+  std::vector<OrderInfo> get_all_orders(OrderType type);
+  void get_all_price_info(OrderType type);
 };
 
 #endif  // LOB_H

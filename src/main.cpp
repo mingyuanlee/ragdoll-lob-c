@@ -85,7 +85,7 @@ void test_lob() {
 }
 
 int main() {
-  test_tree();
+  // test_tree();
 
-  // test_lob();
+  test_lob();
 }

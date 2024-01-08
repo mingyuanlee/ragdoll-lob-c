@@ -1,5 +1,7 @@
 #include <cassert>
+#include <vector>
 #include "LOB.h"
+#include "DTO.h"
 
 LOB::LOB(int instrument): 
   next_oid {1}, bid_tree {instrument, BID}, ask_tree {instrument, ASK}, instrument {instrument}, 
@@ -21,7 +23,7 @@ int LOB::make_order(OrderType type, int limit_price, int volume, int owner) {
   if (type == BID) { // buy
     // ask_price = 0 means there is no waiting order, empty tree
     while (ask_price != 0 && (limit_price != 0 ? ask_price <= limit_price : true) && remaining_vol > 0) {
-      LimitNode *ask_node = ask_tree.limit_map[ask_price];
+      LimitNode *ask_node = ask_tree.get_limit_node(ask_price);
       last_executed_price = ask_price;
       if (remaining_vol >= ask_node->total_volume) {
         int vol_to_deduct = ask_node->total_volume;
@@ -50,11 +52,11 @@ int LOB::make_order(OrderType type, int limit_price, int volume, int owner) {
       if (limit_price > 0) {
         bid_tree.insert_limit_price(limit_price);
         // LimitNode *new_node = bid_tree.get_limit_node(limit_price);
-        bid_tree.insert_order(oid, remaining_vol, owner, limit_price);
+        bid_tree.insert_order(oid, limit_price, remaining_vol, owner);
       } else {
         bid_tree.insert_limit_price(last_executed_price);
         // LimitNode *new_node = bid_tree.get_limit_node(last_executed_price);
-        bid_tree.insert_order(oid, remaining_vol, owner, limit_price); // limit price here instead of last executed price
+        bid_tree.insert_order(oid, limit_price, remaining_vol, owner); // limit price here instead of last executed price
       }
     }
   } else { // sell
@@ -65,4 +67,13 @@ int LOB::make_order(OrderType type, int limit_price, int volume, int owner) {
 
 void LOB::cancel_order(OrderType type, int oid) {
 
+}
+
+/* ************************************
+ *            Query Functions
+ * ************************************/
+
+std::vector<OrderInfo> LOB::get_all_orders(OrderType type) {
+  LLRBTree *tree = (type == BID ? &bid_tree : &ask_tree);
+  return tree->get_all_orders();
 }

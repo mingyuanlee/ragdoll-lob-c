@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <vector>
 
 #include "LLRBTree.h"
 #include "Utils.h"
@@ -207,6 +208,15 @@ LimitNode *LLRBTree::get_limit_node(int limit_price) const {
   }
 }
 
+vector<OrderInfo> LLRBTree::get_all_orders() {
+  vector<OrderInfo> orders;
+  for (auto it = order_map.begin(); it != order_map.end(); it++) {
+    OrderNode *order = it->second;
+    orders.push_back(OrderInfo(order->oid, order->limit_price, order->volume));
+  }
+  return orders;
+}
+
 
 /* ************************************
  *            Order Functions
@@ -271,3 +281,4 @@ void LLRBTree::print_orders_via_map() {
     cout << it->first << " " << it->second->oid << endl;
   }
 }
+
