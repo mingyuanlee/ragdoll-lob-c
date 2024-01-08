@@ -7,11 +7,7 @@
 
 using namespace std;
 
-LLRBTree::LLRBTree(int instrument, OrderType type) {
-  this->root = nullptr;
-  this->instrument = instrument;
-  this->type = type;
-}
+LLRBTree::LLRBTree(int instrument, OrderType type): root {nullptr}, instrument {instrument}, type {type} {}
 
 /* ************************************
  *            Tree Helpers

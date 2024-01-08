@@ -1,9 +1,10 @@
 #include "LLRBTree.h"
+#include "LOB.h"
 #include <iostream>
 #include <string>
 using namespace std;
 
-int main() {
+void test_tree() {
   LLRBTree *bid_tree = new LLRBTree(1, BID);
 
   // Test limit insertions
@@ -67,4 +68,24 @@ int main() {
   bid_tree->print();
   bid_tree->print_orders_via_tree();
   bid_tree->print_orders_via_map();
+
+  // clean up
+  delete bid_tree;
+  bid_tree = nullptr; 
+}
+
+void test_lob() {
+  LOB lob = LOB(1);
+  
+  /* test making bid orders */
+  lob.make_order(BID, 100, 10, 1);
+  lob.make_order(BID, 105, 10, 2);
+  lob.make_order(BID, 95, 20, 1);
+
+}
+
+int main() {
+  test_tree();
+
+  // test_lob();
 }

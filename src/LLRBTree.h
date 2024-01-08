@@ -39,7 +39,7 @@ public:
   OrderType type; // bid or ask
   std::unordered_map<int, LimitNode*> limit_map; // limit price -> LimitNode
   std::unordered_map<int, OrderNode*> order_map; // order id -> Order
-
+  
   LLRBTree(int instrument, OrderType type);
   
   // tree modification

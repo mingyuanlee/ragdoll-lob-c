@@ -1,6 +1,10 @@
 #include <cassert>
 #include "LOB.h"
 
+LOB::LOB(int instrument): 
+  next_oid {1}, bid_tree {instrument, BID}, ask_tree {instrument, ASK}, instrument {instrument}, 
+  ask_price {0}, bid_price {0} {}
+
 /**
  * Make an order
  * If limit_price == 0, means no limit price
