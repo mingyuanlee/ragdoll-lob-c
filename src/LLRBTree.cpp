@@ -135,10 +135,13 @@ LimitNode *LLRBTree::insert(LimitNode *h, int limit_price) {
 }
 
 void LLRBTree::delete_limit_price(int limit_price) {
-  // assert key is in the tree
+  // TODO: assert key is in the tree
   
+  // delete all orders in the limit node
+  delete_all_orders(limit_price);
+
+  // tree node deletion
   if (!is_red(root->left) && !is_red(root->right)) root->color = RED;
-  
   root = delete_(root, limit_price);
   if (!is_empty()) root->color = BLACK;
 
@@ -173,6 +176,18 @@ LimitNode *LLRBTree::delete_(LimitNode *h, int limit_price) {
   return balance(h);
 }
 
+void LLRBTree::delete_all_orders(int limit_price) {
+  LimitNode *node = limit_map[limit_price];
+  OrderNode *current = node->head;
+  while (current != nullptr) {
+    OrderNode *next = current->next;
+    // Delete the order map entry
+    order_map.erase(current->oid);
+    // Delete the order
+    delete current;
+    current = next;
+  }
+}
 
 /* ************************************
  *            Order Functions

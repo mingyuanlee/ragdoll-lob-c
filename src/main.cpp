@@ -6,13 +6,13 @@ using namespace std;
 int main() {
   LLRBTree *bid_tree = new LLRBTree(1, BID);
 
-  // Test insertions
+  // Test limit insertions
   for (int i = 1; i <= 5; i++) {
     bid_tree->insert_limit_price(i * 10);
   }
   bid_tree->print();
 
-  // Test deletions
+  // Test limit deletions
   // cout << "---------------------" << endl;
   bid_tree->delete_limit_price(20);
   bid_tree->delete_limit_price(50);
@@ -47,9 +47,24 @@ int main() {
 
   // Test single order deletions
   cout << "---------------------" << endl;
+  cout << "Testing single order deletions" << endl;
+  bid_tree->print();
   bid_tree->cancel_order(1);
   bid_tree->cancel_order(3);
   bid_tree->cancel_order(5);
+  bid_tree->print_orders_via_tree();
+  bid_tree->print_orders_via_map();
+
+  // Test remove whole limit node and its orders
+  cout << "---------------------" << endl;
+  cout << "Testing remove whole limit node and its orders" << endl;
+  cout << "Before remove limit node 10" << endl;
+  bid_tree->print();
+  bid_tree->print_orders_via_tree();
+  bid_tree->print_orders_via_map();
+  cout << "After remove limit node 10" << endl;
+  bid_tree->delete_limit_price(10);
+  bid_tree->print();
   bid_tree->print_orders_via_tree();
   bid_tree->print_orders_via_map();
 }

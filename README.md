@@ -18,4 +18,5 @@ https://sedgewick.io/wp-content/themes/sedgewick/papers/2008LLRB.pdf
 https://algs4.cs.princeton.edu/33balanced/RedBlackBST.java.html
 
 
-Deletion example in Introduction To Algorithms
+Tech Debt:
+- We haven't examined memory leak and dangling pointer problem in deletion

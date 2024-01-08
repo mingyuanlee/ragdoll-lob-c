@@ -16,6 +16,7 @@ private:
   /* Tree Node Operations */
   LimitNode *insert(LimitNode *h, int limit_price);
   LimitNode *delete_(LimitNode *h, int limit_price);
+  void delete_all_orders(int limit_price);
   
   /* LLRB Tree Helpers */
   bool is_red(LimitNode *h);
