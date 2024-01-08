@@ -7,7 +7,7 @@
 
 using namespace std;
 
-LLRBTree::LLRBTree(int instrument, TreeType type) {
+LLRBTree::LLRBTree(int instrument, OrderType type) {
   this->root = nullptr;
   this->instrument = instrument;
   this->type = type;
@@ -188,6 +188,29 @@ void LLRBTree::delete_all_orders(int limit_price) {
     current = next;
   }
 }
+
+/* ************************************
+ *            Query Functions
+ * ************************************/
+
+// TODO: O(h) time, make it O(1) time when have time
+LimitNode *LLRBTree::min_limit_node(){
+  if (root == nullptr) return nullptr;
+  LimitNode *curr = root;
+  while (curr->left != nullptr) { curr = curr->left; }
+  return curr;
+}
+
+// returns null if the limit node does not exist, return read-only pointer
+LimitNode *LLRBTree::get_limit_node(int limit_price) const {
+  auto it = limit_map.find(limit_price);
+  if (it != limit_map.end()) {
+    return it->second;
+  } else {
+    return nullptr;
+  }
+}
+
 
 /* ************************************
  *            Order Functions

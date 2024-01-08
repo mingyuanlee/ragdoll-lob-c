@@ -6,7 +6,7 @@
 
 #include "LimitNode.h"
 
-enum TreeType {BID, ASK};
+enum OrderType {BID, ASK};
 
 class LLRBTree
 {
@@ -36,17 +36,23 @@ private:
   void print_orders_via_tree_helper(LimitNode *h);
 public:
   int instrument; // instrument id
-  TreeType type; // bid or ask
+  OrderType type; // bid or ask
   std::unordered_map<int, LimitNode*> limit_map; // limit price -> LimitNode
   std::unordered_map<int, OrderNode*> order_map; // order id -> Order
 
-  LLRBTree(int instrument, TreeType tree_type);
+  LLRBTree(int instrument, OrderType type);
   
+  // tree modification
   void insert_limit_price(int limit_price);
   void delete_limit_price(int limit_price);
   
+  // order modification (inside tree node)
   void insert_order(int oid, int limit_price, int volume, int owner);
   void cancel_order(int oid);
+
+  // query functions
+  LimitNode *min_limit_node();
+  LimitNode *get_limit_node(int limit_price) const;
 
   // debug functions
   void print();
