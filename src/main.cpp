@@ -76,25 +76,60 @@ void test_tree() {
   bid_tree = nullptr; 
 }
 
+void print_order_and_price_info(LOB &lob) {
+  cout << "all orders - BID" << endl;
+  vector<OrderInfo> orders = lob.get_all_orders(BID);
+  for (int i = 0; i < orders.size(); i++) {
+    cout << orders[i].oid << " " << orders[i].limit_price << " " << orders[i].volume << endl;
+  }
+  cout << "all orders - ASK" << endl;
+  orders = lob.get_all_orders(ASK);
+  for (int i = 0; i < orders.size(); i++) {
+    cout << orders[i].oid << " " << orders[i].limit_price << " " << orders[i].volume << endl;
+  }
+  cout << "all price info - BID" << endl;
+  vector<PriceInfo> prices = lob.get_all_price_info(BID);
+  for (int i = 0; i < prices.size(); i++) {
+    cout << prices[i].limit_price << " " << prices[i].total_volume << " " << prices[i].size << endl;
+  }
+  cout << "all price info - ASK" << endl;
+  prices = lob.get_all_price_info(ASK);
+  for (int i = 0; i < prices.size(); i++) {
+    cout << prices[i].limit_price << " " << prices[i].total_volume << " " << prices[i].size << endl;
+  }
+}
+
+void print_best_price_info(LOB &lob) {
+  cout << "best price " << lob.get_best_price(BID) << " " << lob.get_best_price(ASK) << endl;
+}
+
 void test_lob() {
   LOB lob = LOB(1);
   
   /* test making limit orders - BID */
   lob.make_order(BID, 100, 10, 1);
+  print_best_price_info(lob);
   lob.make_order(BID, 105, 10, 2);
   lob.make_order(BID, 95, 20, 1);
+  print_best_price_info(lob);
   lob.make_order(BID, 105, 20, 3);
   lob.make_order(BID, 100, 35, 1);
-  cout << "all orders" << endl;
-  vector<OrderInfo> orders = lob.get_all_orders(BID);
-  for (int i = 0; i < orders.size(); i++) {
-    cout << orders[i].oid << " " << orders[i].limit_price << " " << orders[i].volume << endl;
-  }
-  cout << "all price info" << endl;
-  vector<PriceInfo> prices = lob.get_all_price_info(BID);
-  for (int i = 0; i < prices.size(); i++) {
-    cout << prices[i].limit_price << " " << prices[i].total_volume << " " << prices[i].size << endl;
-  }
+  print_best_price_info(lob);
+  print_order_and_price_info(lob);
+
+  /* test making limit orders - ASK */
+  cout << "---------------------" << endl;
+  lob.make_order(ASK, 120, 10, 1);
+  print_best_price_info(lob);
+  lob.make_order(ASK, 115, 10, 2);
+  lob.make_order(ASK, 130, 20, 1);
+  print_best_price_info(lob);
+  lob.make_order(ASK, 115, 20, 3);
+  lob.make_order(ASK, 120, 35, 1);
+  print_best_price_info(lob);
+  print_order_and_price_info(lob);
+
+  /* test canceling limit orders */
 
 }
 

@@ -104,7 +104,9 @@ void LLRBTree::copy_data(LimitNode *dest, LimitNode *src) {
  *            Tree Functions
  * ************************************/
 
+// will do nothing if the limit price already exists
 void LLRBTree::insert_limit_price(int limit_price) {
+  if (limit_map.find(limit_price) != limit_map.end()) return;
   root = insert(root, limit_price);
   root->color = BLACK;
 }
@@ -132,7 +134,8 @@ LimitNode *LLRBTree::insert(LimitNode *h, int limit_price) {
 }
 
 void LLRBTree::delete_limit_price(int limit_price) {
-  // TODO: assert key is in the tree
+  // limit price must exist
+  assert(limit_map.find(limit_price) != limit_map.end());
   
   // delete all orders in the limit node
   delete_all_orders(limit_price);
@@ -191,10 +194,18 @@ void LLRBTree::delete_all_orders(int limit_price) {
  * ************************************/
 
 // TODO: O(h) time, make it O(1) time when have time
-LimitNode *LLRBTree::min_limit_node(){
+LimitNode *LLRBTree::min_limit_node() {
   if (root == nullptr) return nullptr;
   LimitNode *curr = root;
   while (curr->left != nullptr) { curr = curr->left; }
+  return curr;
+}
+
+// TODO: O(h) time, make it O(1) time when have time
+LimitNode *LLRBTree::max_limit_node() {
+  if (root == nullptr) return nullptr;
+  LimitNode *curr = root;
+  while (curr->right != nullptr) { curr = curr->right; }
   return curr;
 }
 

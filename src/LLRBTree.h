@@ -56,6 +56,7 @@ public:
 
   // query functions
   LimitNode *min_limit_node();
+  LimitNode *max_limit_node();
   LimitNode *get_limit_node(int limit_price) const;
   std::vector<OrderInfo> get_all_orders();
   std::vector<PriceInfo> get_all_price_info();
