@@ -14,11 +14,19 @@ private:
   LimitNode *root;
 
   LimitNode *insert(LimitNode *h, int limit_price);
+  LimitNode *delete_(LimitNode *h, int limit_price);
   
   bool is_red(LimitNode *h);
   void color_flip(LimitNode *h);
   LimitNode *rotate_left(LimitNode *h);
   LimitNode *rotate_right(LimitNode *h);
+
+  LimitNode *move_red_left(LimitNode *h);
+  LimitNode *move_red_right(LimitNode *h);
+  LimitNode *delete_min(LimitNode *h);
+  LimitNode *balance(LimitNode *h);
+  LimitNode *min(LimitNode *x);
+  bool is_empty();
 protected:
   void prettyPrint(LimitNode* root, std::string prefix = "", bool isLeft = false);
 public:
@@ -29,7 +37,7 @@ public:
 
   LLRBTree(int instrument, TreeType tree_type);
   void insert_limit_price(int limit_price);
-  // void delete_limit_price(int limit_price);
+  void delete_limit_price(int limit_price);
   // void inorder();
   
   void print();
