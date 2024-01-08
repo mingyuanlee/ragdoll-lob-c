@@ -96,7 +96,12 @@ void LLRBTree::insert_limit_price(int limit_price) {
 }
 
 LimitNode *LLRBTree::insert(LimitNode *h, int limit_price) {
-  if (h == nullptr) return new LimitNode(limit_price);
+  if (h == nullptr) {
+    // put the limit node in the map
+    LimitNode *new_node = new LimitNode(limit_price);
+    limit_map[limit_price] = new_node;
+    return new_node;
+  }
 
   if (is_red(h->left) && is_red(h->right)) color_flip(h);
 
@@ -119,6 +124,9 @@ void LLRBTree::delete_limit_price(int limit_price) {
   
   root = delete_(root, limit_price);
   if (!is_empty()) root->color = BLACK;
+
+  // remove the limit node from the map
+  limit_map.erase(limit_price);
 }
 
 LimitNode *LLRBTree::delete_(LimitNode *h, int limit_price) {
@@ -141,22 +149,26 @@ LimitNode *LLRBTree::delete_(LimitNode *h, int limit_price) {
   return balance(h);
 }
 
+// -----------------------
+//      test functions
+// -----------------------
+
 void LLRBTree::print() {
   prettyPrint(root);
 }
 
 void LLRBTree::prettyPrint(LimitNode* root, string prefix, bool isLeft) {
-  if( root != nullptr )
-  {
+  if( root != nullptr ) {
     std::cout << prefix;
-
     std::cout << (isLeft ? "├──" : "└──" );
-
-    // print the value of the node
     std::cout << root->limit_price << std::endl;
-
-    // enter the next tree level - left and right branch
     prettyPrint( root->left, prefix + (isLeft ? "│   " : "    "), true);
     prettyPrint( root->right, prefix + (isLeft ? "│   " : "    "), false);
+  }
+}
+
+void LLRBTree::print_limit_map() {
+  for (auto it = limit_map.begin(); it != limit_map.end(); it++) {
+    cout << it->first << " " << it->second->limit_price << endl;
   }
 }

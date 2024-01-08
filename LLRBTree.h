@@ -32,15 +32,16 @@ protected:
 public:
   int instrument; // instrument id
   TreeType type; // bid or ask
-  // std::unordered_map<int, LimitNode*> limit_map; // limit price -> LimitNode
-  // std::unordered_map<int, OrderNode*> order_map; // order id -> Order
+  std::unordered_map<int, LimitNode*> limit_map; // limit price -> LimitNode
+  std::unordered_map<int, OrderNode*> order_map; // order id -> Order
 
   LLRBTree(int instrument, TreeType tree_type);
   void insert_limit_price(int limit_price);
   void delete_limit_price(int limit_price);
-  // void inorder();
   
+  // test functions
   void print();
+  void print_limit_map();
 };
 
 #endif // LLRB_TREE_H
