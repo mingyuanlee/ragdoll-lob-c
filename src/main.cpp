@@ -34,12 +34,22 @@ int main() {
   cout << "---------------------" << endl;
   // Here we have limit nodes: 30, 10, 40
   bid_tree->print();
+  bid_tree->print_limit_map();
   bid_tree->insert_order(1, 30, 10, 1);
   bid_tree->insert_order(2, 30, 20, 2);
   bid_tree->insert_order(3, 30, 30, 3);
   bid_tree->insert_order(4, 10, 10, 4);
   bid_tree->insert_order(5, 40, 20, 5);
   bid_tree->insert_order(6, 40, 20, 5);
+  bid_tree->insert_order(7, 10, 20, 5);
+  bid_tree->print_orders_via_tree();
+  bid_tree->print_orders_via_map();
+
+  // Test single order deletions
+  cout << "---------------------" << endl;
+  bid_tree->cancel_order(1);
+  bid_tree->cancel_order(3);
+  bid_tree->cancel_order(5);
   bid_tree->print_orders_via_tree();
   bid_tree->print_orders_via_map();
 }

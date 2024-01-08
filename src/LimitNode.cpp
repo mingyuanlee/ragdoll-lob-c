@@ -50,14 +50,7 @@ OrderNode *LimitNode::insert_order(int oid, int volume, int owner) {
   return order;
 }
 
-// TODO: Note that bid_order_map still references to this node. It is caller(LOB)'s responsibility to delete the map entry first
-// using 
-/*
-auto it = myMap.find(key);
-if (it != myMap.end()) {
-    myMap.erase(it);
-}
-*/
+
 void LimitNode::delete_order(OrderNode *order) {
   // 1. remove from the linked list
   if (order->prev != nullptr) {
@@ -66,12 +59,17 @@ void LimitNode::delete_order(OrderNode *order) {
   if (order->next != nullptr) {
     order->next->prev = order->prev;
   }
-  // 2. clean up the memory
-  delete order;
-  order = nullptr;
-  // 3. update metadata
+
+  // update head and tail pointers:
+  if (order == tail) tail = order->prev;
+  if (order == head) head = order->next;
+
+  // 2. update metadata
   total_volume -= order->volume;
   size -= limit_price * order->volume;
+  // 3. clean up the memory
+  delete order;
+  order = nullptr; // is this line necessary?
 }
 
 // Pop an order in FIFO manner
