@@ -13,6 +13,10 @@ LLRBTree::LLRBTree(int instrument, TreeType type) {
   this->type = type;
 }
 
+/* ************************************
+ *            Tree Helpers
+ * ************************************/
+
 bool LLRBTree::is_red(LimitNode *h) {
   if (h == nullptr) return false;
   return h->color == RED;
@@ -92,6 +96,17 @@ bool LLRBTree::is_empty() {
   return root == nullptr;
 }
 
+void LLRBTree::copy_data(LimitNode *dest, LimitNode *src) {
+  dest->total_volume = src->total_volume;
+  dest->size = src->size;
+  dest->head = src->head;
+  dest->tail = src->tail;
+}
+
+/* ************************************
+ *            Tree Functions
+ * ************************************/
+
 void LLRBTree::insert_limit_price(int limit_price) {
   root = insert(root, limit_price);
   root->color = BLACK;
@@ -141,8 +156,15 @@ LimitNode *LLRBTree::delete_(LimitNode *h, int limit_price) {
     if (!is_red(h->right) && !is_red(h->right->left)) h = move_red_right(h);
     if (limit_price == h->limit_price) {
       LimitNode *x = min(h->right);
+      
+      // Note: must swap map refenrences
+      LimitNode *tmp = limit_map[h->limit_price];
+      limit_map[h->limit_price] = limit_map[x->limit_price];
+      limit_map[x->limit_price] = tmp;
+
       h->limit_price = x->limit_price;
-      // TODO: h.val = x.val
+      copy_data(h, x);
+
       h->right = delete_min(h->right);
     } else {
       h->right = delete_(h->right, limit_price);
@@ -151,9 +173,27 @@ LimitNode *LLRBTree::delete_(LimitNode *h, int limit_price) {
   return balance(h);
 }
 
-// -----------------------
-//      test functions
-// -----------------------
+
+/* ************************************
+ *            Order Functions
+ * ************************************/
+
+void LLRBTree::insert_order(int oid, int limit_price, int volume, int owner) {
+  LimitNode *node = limit_map[limit_price];
+  OrderNode *order = node->insert_order(oid, volume, owner);
+  order_map[oid] = order;
+}
+
+void LLRBTree::cancel_order(int oid) {
+  OrderNode *order = order_map[oid];
+  LimitNode *node = order->limit_node;
+  node->delete_order(order);
+  order_map.erase(oid);
+}
+
+/* ************************************
+ *            Test Functions
+ * ************************************/
 
 void LLRBTree::print() {
   prettyPrint(root);
@@ -180,7 +220,9 @@ void LLRBTree::print_orders_via_tree() {
 }
 
 void LLRBTree::print_orders_via_tree_helper(LimitNode *h) {
+  if (h == nullptr) return;
   print_orders_via_tree_helper(h->left);
+  cout << "limit price: " << h->limit_price << ": ";
   Utils::print_linked_list(h->head, h->tail);
   print_orders_via_tree_helper(h->right);
 }

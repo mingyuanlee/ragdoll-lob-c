@@ -1,5 +1,7 @@
 #include "LimitNode.h"
 
+#include <iostream>
+
 // ===================================================
 // ==================== OrderNode ====================
 // ===================================================
@@ -27,7 +29,6 @@ LimitNode::LimitNode(int limit_price) {
   this->right = nullptr;
   this->head = nullptr;
   this->tail = nullptr;
-  this->parent = nullptr;
   this->color = RED;
 }
 
@@ -35,6 +36,7 @@ OrderNode *LimitNode::insert_order(int oid, int volume, int owner) {
   // 1. make the order node
   OrderNode *order = new OrderNode(oid, limit_price, volume, owner, nullptr, nullptr, this);
   // 2. insert into the linked list
+  std::cout << "inserting order: " << oid << " " << head << " " << tail << std::endl;
   if (head == nullptr) {
     head = order;
     tail = order;
