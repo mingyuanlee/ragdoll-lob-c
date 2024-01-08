@@ -13,37 +13,42 @@ LFLAGS=
 # Define any libraries to link into executable
 LIBS=
 
+# Define source directory
+SRCDIR=src
+
+# Define build directory
+BUILDDIR=build
+
 # Define the C++ source files
-SRCS=LLRBTree.cpp LimitNode.cpp Utils.cpp main.cpp
+SRCS=$(wildcard $(SRCDIR)/*.cpp)
 
 # Define the C++ header files
-HDRS=LLRBTree.h LimitNode.h Utils.h
+HDRS=$(wildcard $(SRCDIR)/*.h)
 
 # Define the C++ object files
-OBJS=$(SRCS:.cpp=.o)
+OBJS=$(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SRCS))
 
 # Define the executable file
 MAIN=orderbook
 
 .PHONY: depend clean
 
-all:	$(MAIN)
+all:	$(BUILDDIR)	$(MAIN)
 	@echo	Simple compiler named orderbook has been compiled
 
 $(MAIN):	$(OBJS) 
 	$(CXX)	$(CXXFLAGS)	$(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 
-# This is a suffix replacement rule for building .o's from .cpp's
-# It uses automatic variables $<: the name of the prerequisite of the rule(a .cpp file)
-# and $@: the name of the target of the rule (a .o file)
-# (see the gnu make manual section about automatic variables)
-.cpp.o:
-	$(CXX)	$(CXXFLAGS)	$(INCLUDES) -c $<  -o $@
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
 
 clean:
-	$(RM)	*.o *~	$(MAIN)
+	$(RM) $(BUILDDIR)/*.o *~ $(MAIN)
 
 depend: $(SRCS)
-	makedepend	$(INCLUDES)	$^
+	makedepend $(INCLUDES) $^
 
 # DO NOT DELETE THIS LINE -- make depend needs it
