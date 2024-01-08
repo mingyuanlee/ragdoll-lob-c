@@ -217,6 +217,19 @@ vector<OrderInfo> LLRBTree::get_all_orders() {
   return orders;
 }
 
+void LLRBTree::get_all_price_info_helper(LimitNode const *curr, vector<PriceInfo> &prices) {
+  if (curr == nullptr) return;
+  get_all_price_info_helper(curr->left, prices);
+  prices.push_back(PriceInfo(curr->limit_price, curr->total_volume, curr->size));
+  get_all_price_info_helper(curr->right, prices);
+}
+
+vector<PriceInfo> LLRBTree::get_all_price_info() {
+  vector<PriceInfo> prices;
+  get_all_price_info_helper(root, prices);
+  return prices;
+}
+
 
 /* ************************************
  *            Order Functions

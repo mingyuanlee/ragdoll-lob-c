@@ -77,3 +77,8 @@ std::vector<OrderInfo> LOB::get_all_orders(OrderType type) {
   LLRBTree *tree = (type == BID ? &bid_tree : &ask_tree);
   return tree->get_all_orders();
 }
+
+std::vector<PriceInfo> LOB::get_all_price_info(OrderType type) {
+  LLRBTree *tree = (type == BID ? &bid_tree : &ask_tree);
+  return tree->get_all_price_info();
+}

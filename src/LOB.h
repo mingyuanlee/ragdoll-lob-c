@@ -25,7 +25,7 @@ public:
 
   /* query */
   std::vector<OrderInfo> get_all_orders(OrderType type);
-  void get_all_price_info(OrderType type);
+  std::vector<PriceInfo> get_all_price_info(OrderType type);
 };
 
 #endif  // LOB_H

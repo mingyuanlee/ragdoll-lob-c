@@ -37,6 +37,9 @@ private:
   void copy_data(LimitNode *dest, LimitNode *src);
   bool is_empty();
 
+  /* Helpers */
+  void get_all_price_info_helper(LimitNode const *curr, std::vector<PriceInfo> &prices);
+
   /* Debug Helpers */
   void prettyPrint(LimitNode* root, std::string prefix = "", bool isLeft = false);
   void print_orders_via_tree_helper(LimitNode *h);
@@ -55,6 +58,7 @@ public:
   LimitNode *min_limit_node();
   LimitNode *get_limit_node(int limit_price) const;
   std::vector<OrderInfo> get_all_orders();
+  std::vector<PriceInfo> get_all_price_info();
 
   // debug functions
   void print();
