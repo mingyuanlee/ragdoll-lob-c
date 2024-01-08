@@ -1,7 +1,9 @@
 
 #include <iostream>
-#include "LLRBTree.h"
 #include <cassert>
+
+#include "LLRBTree.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -170,5 +172,21 @@ void LLRBTree::prettyPrint(LimitNode* root, string prefix, bool isLeft) {
 void LLRBTree::print_limit_map() {
   for (auto it = limit_map.begin(); it != limit_map.end(); it++) {
     cout << it->first << " " << it->second->limit_price << endl;
+  }
+}
+
+void LLRBTree::print_orders_via_tree() {
+  print_orders_via_tree_helper(root);
+}
+
+void LLRBTree::print_orders_via_tree_helper(LimitNode *h) {
+  print_orders_via_tree_helper(h->left);
+  Utils::print_linked_list(h->head, h->tail);
+  print_orders_via_tree_helper(h->right);
+}
+
+void LLRBTree::print_orders_via_map() {
+  for (auto it = order_map.begin(); it != order_map.end(); it++) {
+    cout << it->first << " " << it->second->oid << endl;
   }
 }

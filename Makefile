@@ -14,10 +14,10 @@ LFLAGS=
 LIBS=
 
 # Define the C++ source files
-SRCS=LLRBTree.cpp LimitNode.cpp main.cpp
+SRCS=LLRBTree.cpp LimitNode.cpp Utils.cpp main.cpp
 
 # Define the C++ header files
-HDRS=LLRBTree.h LimitNode.h
+HDRS=LLRBTree.h LimitNode.h Utils.h
 
 # Define the C++ object files
 OBJS=$(SRCS:.cpp=.o)

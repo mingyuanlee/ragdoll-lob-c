@@ -27,8 +27,9 @@ private:
   LimitNode *balance(LimitNode *h);
   LimitNode *min(LimitNode *x);
   bool is_empty();
-protected:
+
   void prettyPrint(LimitNode* root, std::string prefix = "", bool isLeft = false);
+  void print_orders_via_tree_helper(LimitNode *h);
 public:
   int instrument; // instrument id
   TreeType type; // bid or ask
@@ -39,9 +40,13 @@ public:
   void insert_limit_price(int limit_price);
   void delete_limit_price(int limit_price);
   
-  // test functions
+  // debug functions
   void print();
   void print_limit_map();
+  // print orders info via the tree
+  void print_orders_via_tree();
+  // print orders info via the map
+  void print_orders_via_map();
 };
 
 #endif // LLRB_TREE_H

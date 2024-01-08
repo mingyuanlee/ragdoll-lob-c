@@ -29,4 +29,7 @@ int main() {
   bid_tree->delete_limit_price(20);
   bid_tree->delete_limit_price(50);
   bid_tree->print_limit_map();
+
+  // Test order insertions
+  cout << "---------------------" << endl;
 }
