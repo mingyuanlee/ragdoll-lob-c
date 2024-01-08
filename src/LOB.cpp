@@ -1,7 +1,10 @@
 #include <cassert>
 #include <vector>
+#include <iostream>
 #include "LOB.h"
 #include "DTO.h"
+
+using namespace std;
 
 LOB::LOB(int instrument): 
   next_oid {1}, bid_tree {instrument, BID}, ask_tree {instrument, ASK}, instrument {instrument}, 
@@ -51,11 +54,9 @@ int LOB::make_order(OrderType type, int limit_price, int volume, int owner) {
     if (remaining_vol > 0) {
       if (limit_price > 0) {
         bid_tree.insert_limit_price(limit_price);
-        // LimitNode *new_node = bid_tree.get_limit_node(limit_price);
         bid_tree.insert_order(oid, limit_price, remaining_vol, owner);
       } else {
         bid_tree.insert_limit_price(last_executed_price);
-        // LimitNode *new_node = bid_tree.get_limit_node(last_executed_price);
         bid_tree.insert_order(oid, limit_price, remaining_vol, owner); // limit price here instead of last executed price
       }
     }

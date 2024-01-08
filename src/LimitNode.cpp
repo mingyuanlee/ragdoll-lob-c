@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 // ===================================================
 // ==================== OrderNode ====================
 // ===================================================
@@ -39,11 +41,11 @@ OrderNode *LimitNode::insert_order(int oid, int volume, int owner) {
   if (head == nullptr) {
     head = order;
     tail = order;
-    return order;
+  } else {
+    tail->next = order;
+    order->prev = tail;
+    tail = order;
   }
-  tail->next = order;
-  order->prev = tail;
-  tail = order;
   // 3. update metadata
   total_volume += order->volume;
   size += limit_price * order->volume;

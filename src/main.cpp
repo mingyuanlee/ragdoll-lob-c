@@ -79,10 +79,12 @@ void test_tree() {
 void test_lob() {
   LOB lob = LOB(1);
   
-  /* test making bid orders */
+  /* test making limit orders - BID */
   lob.make_order(BID, 100, 10, 1);
   lob.make_order(BID, 105, 10, 2);
   lob.make_order(BID, 95, 20, 1);
+  lob.make_order(BID, 105, 20, 3);
+  lob.make_order(BID, 100, 35, 1);
   cout << "all orders" << endl;
   vector<OrderInfo> orders = lob.get_all_orders(BID);
   for (int i = 0; i < orders.size(); i++) {
@@ -93,7 +95,6 @@ void test_lob() {
   for (int i = 0; i < prices.size(); i++) {
     cout << prices[i].limit_price << " " << prices[i].total_volume << " " << prices[i].size << endl;
   }
-
 
 }
 
