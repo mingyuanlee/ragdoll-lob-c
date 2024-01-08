@@ -12,4 +12,6 @@ Reference: https://stackoverflow.com/questions/13852870/red-black-tree-over-avl-
 
 Check these:
 https://www.uoitc.edu.iq/images/documents/informatics-institute/Competitive_exam/DataStructures.pdf
-https://debby-nirwan.medium.com/how-is-c-map-implemented-8cc10c93684a
+https://sedgewick.io/wp-content/themes/sedgewick/papers/2008LLRB.pdf
+
+Deletion example in Introduction To Algorithms
