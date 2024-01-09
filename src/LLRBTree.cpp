@@ -253,6 +253,7 @@ void LLRBTree::insert_order(int oid, int limit_price, int volume, int owner) {
 }
 
 void LLRBTree::cancel_order(int oid) {
+  if (order_map.find(oid) == order_map.end()) return; // do nothing if the order does not exist
   OrderNode *order = order_map[oid];
   LimitNode *node = order->limit_node;
   node->delete_order(order);

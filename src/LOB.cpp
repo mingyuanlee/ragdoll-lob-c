@@ -24,7 +24,7 @@ void LOB::update_price(OrderType type) {
  * Make an order
  * If limit_price == 0, means no limit price
  * 
- * There are three situations in the loop:
+ * There are two situations in the loop:
  * **** Situation 1: remaining_vol >= node.total_vol -> delete the whole node 
  * **** Situation 2: remaining_vol < node.total_vol -> do loop: check the first node, if fully filled pop the node, if partially filled deduct the amount
  * After the loop, need to create the limit node for the remaining
@@ -46,7 +46,9 @@ int LOB::make_order(OrderType type, int limit_price, int volume, int owner) {
       } else {
         OrderNode *curr = ask_node->head;
         while (remaining_vol > 0) {
-          assert(curr != nullptr); // the above if statement should ensure the curr pointer won't reach the end, if the assertion fails, it means there is inconsistency between the metadata and linked list
+          // the above if statement should ensure the curr pointer won't reach the end, 
+          // if the assertion fails, it means there is inconsistency between the metadata and linked list
+          assert(curr != nullptr); 
           OrderNode *next = curr->next;
           if (curr->volume <= remaining_vol) {
             remaining_vol -= curr->volume;
@@ -112,8 +114,18 @@ int LOB::make_order(OrderType type, int limit_price, int volume, int owner) {
   return oid;
 }
 
+/**
+ * Cancel an order
+ * 
+ * Simply delete the order, do nothing if not exist
+ * Do not handle dangling limit node: the daemon will periodically clean up the dangling limit nodes
+ */
 void LOB::cancel_order(OrderType type, int oid) {
-
+  if (type == BID) {
+    bid_tree.cancel_order(oid);
+  } else {
+    ask_tree.cancel_order(oid);
+  }
 }
 
 /* ************************************

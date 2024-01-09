@@ -1,4 +1,3 @@
-RB Tree
 
 Limit Map: Each limit price maps to Limit Node
 Order Map: Each order id maps to Order Node
@@ -11,6 +10,9 @@ LLRBTree is responsible for:
 
 LOB is responsible for:
 1. updating best ask and bid prices.
+1. make sure there is no dangling limit node (= limit node with no order)
+  1. this means LOB will delete the whole node when the last order is removed 
+  1. a possible optimization: don't remove limit node to avoid frequent insertion/deletion, give every node a timeout value, use a scheduling task to remove all nodes if timeout value is reached
 
 The reason of choosing RB Tree over AVL Tree
 LOB is insert-intensive instead of lookup-intensive.

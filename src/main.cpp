@@ -130,6 +130,11 @@ void test_lob() {
   print_order_and_price_info(lob);
 
   /* test canceling limit orders */
+  cout << "---------------------" << endl;
+  
+
+  /* test match engine */
+  cout << "---------------------" << endl;
 
 }
 
