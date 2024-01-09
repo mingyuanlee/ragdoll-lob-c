@@ -52,9 +52,10 @@ void test_tree() {
   cout << "---------------------" << endl;
   cout << "Testing single order deletions" << endl;
   bid_tree->print();
-  bid_tree->cancel_order(1);
-  bid_tree->cancel_order(3);
-  bid_tree->cancel_order(5);
+  bool dangling;
+  bid_tree->cancel_order(1, dangling);
+  bid_tree->cancel_order(3, dangling);
+  bid_tree->cancel_order(5, dangling);
   bid_tree->print_orders_via_tree();
   bid_tree->print_orders_via_map();
 
@@ -131,10 +132,20 @@ void test_lob() {
 
   /* test canceling limit orders */
   cout << "---------------------" << endl;
-  
+  lob.cancel_order(BID, 2);
+  lob.cancel_order(BID, 4);
+  lob.cancel_order(BID, 5);
+  lob.cancel_order(ASK, 9);
+  lob.cancel_order(ASK, 10);
+  lob.cancel_order(ASK, 7);
+  print_best_price_info(lob);
+  print_order_and_price_info(lob);
 
   /* test match engine */
   cout << "---------------------" << endl;
+  lob.make_order(BID, 130, 15, 1);
+  print_best_price_info(lob);
+  print_order_and_price_info(lob);
 
 }
 

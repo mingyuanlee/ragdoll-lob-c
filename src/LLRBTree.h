@@ -52,7 +52,7 @@ public:
   
   // order modification (inside tree node)
   void insert_order(int oid, int limit_price, int volume, int owner);
-  void cancel_order(int oid);
+  void cancel_order(int oid, bool &dangling);
 
   // query functions
   LimitNode *min_limit_node();

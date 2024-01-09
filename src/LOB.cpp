@@ -118,13 +118,14 @@ int LOB::make_order(OrderType type, int limit_price, int volume, int owner) {
  * Cancel an order
  * 
  * Simply delete the order, do nothing if not exist
- * Do not handle dangling limit node: the daemon will periodically clean up the dangling limit nodes
+ * Need to handle price updates if met dangling limit node
  */
 void LOB::cancel_order(OrderType type, int oid) {
-  if (type == BID) {
-    bid_tree.cancel_order(oid);
-  } else {
-    ask_tree.cancel_order(oid);
+  LLRBTree *tree = (type == BID ? &bid_tree : &ask_tree);
+  bool dangling;
+  tree->cancel_order(oid, dangling); // this function will remove dangling limit node
+  if (dangling) {
+    update_price(type);
   }
 }
 

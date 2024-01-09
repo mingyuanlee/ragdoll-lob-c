@@ -69,9 +69,10 @@ void LimitNode::delete_order(OrderNode *order) {
   // 2. update metadata
   total_volume -= order->volume;
   size -= limit_price * order->volume;
+
   // 3. clean up the memory
   delete order;
-  order = nullptr; // is this line necessary?
+  order = nullptr;
 }
 
 // Pop an order in FIFO manner

@@ -193,11 +193,10 @@ void LLRBTree::delete_all_orders(int limit_price) {
  *            Query Functions
  * ************************************/
 
-// TODO: O(h) time, make it O(1) time when have time
 LimitNode *LLRBTree::min_limit_node() {
   if (root == nullptr) return nullptr;
   LimitNode *curr = root;
-  while (curr->left != nullptr) { curr = curr->left; }
+  while (curr->left != nullptr) curr = curr->left;
   return curr;
 }
 
@@ -252,12 +251,18 @@ void LLRBTree::insert_order(int oid, int limit_price, int volume, int owner) {
   order_map[oid] = order;
 }
 
-void LLRBTree::cancel_order(int oid) {
+// WILL remove dangling limit node
+void LLRBTree::cancel_order(int oid, bool &dangling) {
   if (order_map.find(oid) == order_map.end()) return; // do nothing if the order does not exist
   OrderNode *order = order_map[oid];
   LimitNode *node = order->limit_node;
   node->delete_order(order);
   order_map.erase(oid);
+  dangling = (node->head == nullptr);
+  if (dangling) {
+    delete_limit_price(node->limit_price);
+    node = nullptr;
+  }
 }
 
 /* ************************************
